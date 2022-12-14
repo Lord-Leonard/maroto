@@ -47,9 +47,10 @@ func (s *text) Add(text string, cell Cell, textProp props.Text) {
 	stringWidth := s.pdf.GetStringWidth(unicodeText)
 	words := strings.Split(unicodeText, " ")
 	accumulateOffsetY := 0.0
+	containsNewline := strings.Contains(unicodeText, "\n")
 
 	// If should add one line
-	if stringWidth < cell.Width || textProp.Extrapolate || len(words) == 1 {
+	if (stringWidth < cell.Width || textProp.Extrapolate || len(words) == 1) && !containsNewline {
 		s.addLine(textProp, cell.X, cell.Width, cell.Y, stringWidth, unicodeText)
 	} else {
 		lines := s.getLines(words, cell.Width)
@@ -79,7 +80,7 @@ func (s *text) GetLinesQuantity(text string, textProp props.Text, colWidth float
 	words := strings.Split(textTranslated, " ")
 
 	// If should add one line.
-	if stringWidth < colWidth || textProp.Extrapolate || len(words) == 1 {
+	if (stringWidth < colWidth || textProp.Extrapolate || len(words) == 1) && !strings.Contains(text, "\n") {
 		return 1
 	}
 
@@ -91,11 +92,11 @@ func (s *text) getLines(words []string, colWidth float64) []string {
 	currentlySize := 0.0
 	actualLine := 0
 
-	lines := []string{}
+	var lines []string
 	lines = append(lines, "")
 
 	for _, word := range words {
-		if s.pdf.GetStringWidth(word+" ")+currentlySize < colWidth {
+		if s.pdf.GetStringWidth(word+" ")+currentlySize < colWidth && !strings.Contains(word, "\n") {
 			lines[actualLine] = lines[actualLine] + word + " "
 			currentlySize += s.pdf.GetStringWidth(word + " ")
 		} else {
