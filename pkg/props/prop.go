@@ -133,6 +133,8 @@ type TableList struct {
 	Line bool
 	// LineProp is the custom properties of the line separating the rows
 	LineProp Line
+	// HorizontalContentPadding defines an inline Padding for the content.
+	HorizontalContentPadding int
 }
 
 // MakeValid from Rect will make the properties from a rectangle reliable to fit inside a cell
