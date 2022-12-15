@@ -107,6 +107,10 @@ func (s *text) getLines(words []string, colWidth float64) []string {
 		}
 	}
 
+	for index, line := range lines {
+		lines[index] = strings.TrimSpace(line)
+	}
+
 	return lines
 }
 
