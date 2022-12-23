@@ -4,6 +4,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/props"
+	"strings"
 )
 
 const (
@@ -113,6 +114,16 @@ func (s *tableList) Create(header []string, contents [][]string, defaultFontFami
 				alignment := tableProp.Align
 				if tableProp.ContentProp.Align != nil && i < len(tableProp.ContentProp.Align) && tableProp.ContentProp.Align[i] != "" {
 					alignment = tableProp.ContentProp.Align[i]
+				}
+
+				if tableProp.HorizontalContentPadding != 0 {
+					padding := strings.Repeat(" ", tableProp.HorizontalContentPadding)
+					switch alignment {
+					case consts.Left:
+						cs = padding + cs
+					case consts.Right:
+						cs = cs + padding
+					}
 				}
 
 				s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {

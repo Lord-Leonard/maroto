@@ -125,6 +125,9 @@ func NewMarotoCustomSize(orientation consts.Orientation, pageSize consts.PageSiz
 		FontDirStr: "",
 	})
 	fpdf.SetMargins(defaultLeftMargin, defaultTopMargin, defaultRightMargin)
+	pageWidth, _ := fpdf.GetPageSize()
+	usefullPageWidth := pageWidth - defaultLeftMargin - defaultRightMargin
+	consts.MaxGridSum = usefullPageWidth
 
 	math := internal.NewMath(fpdf)
 	font := internal.NewFont(fpdf, defaultFontSize, consts.Arial, consts.Bold)
@@ -227,6 +230,11 @@ func (s *PdfMaroto) SetPageMargins(left, top, right float64) {
 	}
 
 	s.Pdf.SetMargins(left, defaultTopMargin, right)
+
+	width, _ := s.GetPageSize()
+	usefullWidth := width - (left + right)
+
+	consts.MaxGridSum = usefullWidth
 }
 
 // GetPageMargins returns the set page margins. Comes in order of Left, Top, Right, Bottom
