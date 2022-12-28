@@ -4,7 +4,6 @@ import (
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/props"
-	"strings"
 )
 
 const (
@@ -74,7 +73,7 @@ func (s *tableList) Create(header []string, contents [][]string, defaultFontFami
 	}
 
 	tableProp.MakeValid(header, defaultFontFamily)
-	headerHeight := s.calcLinesHeight(header, tableProp.HeaderProp, tableProp.Align)
+	headerHeight := s.calcLinesHeight(header, tableProp.HeaderProp, tableProp.Align, consts.None, 0)
 
 	// Draw header.
 	s.pdf.Row(headerHeight+1, func() {
@@ -88,7 +87,7 @@ func (s *tableList) Create(header []string, contents [][]string, defaultFontFami
 
 			s.pdf.Col(tableProp.HeaderProp.GridSizes[i], func() {
 				reason := hs
-				s.pdf.Text(reason, tableProp.HeaderProp.ToTextProp(alignment, 0, false, 0.0))
+				s.pdf.Text(reason, tableProp.HeaderProp.ToTextProp(alignment, 0, false, 0.0, "", 0))
 			})
 		}
 	})
@@ -100,7 +99,7 @@ func (s *tableList) Create(header []string, contents [][]string, defaultFontFami
 
 	// Draw contents.
 	for index, content := range contents {
-		contentHeight := s.calcLinesHeight(content, tableProp.ContentProp, tableProp.Align)
+		contentHeight := s.calcLinesHeight(content, tableProp.ContentProp, tableProp.Align, consts.None, tableProp.HorizontalContentPadding)
 		contentHeightPadded := contentHeight + tableProp.VerticalContentPadding
 
 		if tableProp.AlternatedBackground != nil && index%2 == 0 {
@@ -116,18 +115,13 @@ func (s *tableList) Create(header []string, contents [][]string, defaultFontFami
 					alignment = tableProp.ContentProp.Align[i]
 				}
 
-				if tableProp.HorizontalContentPadding != 0 {
-					padding := strings.Repeat(" ", tableProp.HorizontalContentPadding)
-					switch alignment {
-					case consts.Left:
-						cs = padding + cs
-					case consts.Right:
-						cs = cs + padding
-					}
+				unit := consts.None
+				if tableProp.ContentProp.Unit != nil && i < len(tableProp.ContentProp.Unit) && tableProp.ContentProp.Unit[i] != consts.None {
+					unit = tableProp.ContentProp.Unit[i]
 				}
 
 				s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
-					s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(alignment, tableProp.VerticalContentPadding/2.0, false, 0.0))
+					s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(alignment, tableProp.VerticalContentPadding/2.0, false, 0.0, unit, tableProp.HorizontalContentPadding))
 				})
 			}
 		})
@@ -142,14 +136,14 @@ func (s *tableList) Create(header []string, contents [][]string, defaultFontFami
 	}
 }
 
-func (s *tableList) calcLinesHeight(textList []string, contentProp props.TableListContent, align consts.Align) float64 {
+func (s *tableList) calcLinesHeight(textList []string, contentProp props.TableListContent, align consts.Align, unit consts.Unit, padding int) float64 {
 	maxLines := 1.0
 
 	left, _, right, _ := s.pdf.GetPageMargins()
 	width, _ := s.pdf.GetPageSize()
 	usefulWidth := width - left - right
 
-	textProp := contentProp.ToTextProp(align, 0, false, 0.0)
+	textProp := contentProp.ToTextProp(align, 0, false, 0.0, unit, padding)
 
 	for i, text := range textList {
 		gridSize := float64(contentProp.GridSizes[i])

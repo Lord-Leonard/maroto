@@ -102,3 +102,15 @@ const (
 	// Dotted represents a dotted style.
 	Dotted LineStyle = "dotted"
 )
+
+// Unit is a representation of a Unit which can be appended to a Text
+type Unit string
+
+const (
+	// None is the Unit Representation for no Unit
+	None Unit = ""
+	//Euro is the Unit Representation for the € Symbol
+	Euro Unit = "€"
+	//Percent is the Unit Representation for the % Symbol
+	Percent Unit = "%"
+)

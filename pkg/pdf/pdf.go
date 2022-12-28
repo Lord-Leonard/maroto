@@ -2,6 +2,7 @@ package pdf
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/johnfercher/maroto/internal/fpdf"
 	"github.com/johnfercher/maroto/pkg/color"
@@ -444,7 +445,21 @@ func (s *PdfMaroto) Text(text string, prop ...props.Text) {
 		textProp = prop[0]
 	}
 
+	if textProp.Unit != "" {
+		text += " " + string(textProp.Unit)
+	}
+
 	textProp.MakeValid(s.defaultFontFamily)
+
+	if textProp.HorricontalPadding != 0 {
+		padding := strings.Repeat(" ", textProp.HorricontalPadding)
+		switch textProp.Align {
+		case consts.Left:
+			text = padding + text
+		case consts.Right:
+			text = text + padding
+		}
+	}
 
 	if textProp.Top > s.rowHeight {
 		textProp.Top = s.rowHeight

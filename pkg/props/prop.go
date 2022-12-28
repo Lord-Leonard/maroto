@@ -52,10 +52,14 @@ type Text struct {
 	Left float64
 	// Right is the minimal amount of space between the right cell boundary and the text.
 	Right float64
+	// HorricontalPadding defines the amount of Whitespaces between the content and the Cell Wall
+	HorricontalPadding int
 	// Family of the text, ex: consts.Arial, helvetica and etc.
 	Family string
 	// Style of the text, ex: consts.Normal, bold and etc.
 	Style consts.Style
+	//Unit definiert die Einheit die Hinter dem Text geschrieben werden soll
+	Unit consts.Unit
 	// Size of the text.
 	Size float64
 	// Align of the text.
@@ -108,6 +112,8 @@ type TableListContent struct {
 	GridSizes []uint
 	// Align defines the individual Alignment for every Column
 	Align []consts.Align
+	//Unit defines the individual Units for every Column
+	Unit []consts.Unit
 }
 
 // TableList represents properties from a TableList.
@@ -278,16 +284,18 @@ func (s *Font) ToTextProp(align consts.Align, top float64, extrapolate bool, ver
 }
 
 // ToTextProp from Font return a TableListContent based on Font.
-func (s *TableListContent) ToTextProp(align consts.Align, top float64, extrapolate bool, verticalPadding float64) Text {
+func (s *TableListContent) ToTextProp(align consts.Align, top float64, extrapolate bool, verticalPadding float64, unit consts.Unit, padding int) Text {
 	textProp := Text{
-		Family:          s.Family,
-		Style:           s.Style,
-		Size:            s.Size,
-		Align:           align,
-		Top:             top,
-		Extrapolate:     extrapolate,
-		VerticalPadding: verticalPadding,
-		Color:           s.Color,
+		Family:             s.Family,
+		Style:              s.Style,
+		Unit:               unit,
+		Size:               s.Size,
+		Align:              align,
+		Top:                top,
+		Extrapolate:        extrapolate,
+		VerticalPadding:    verticalPadding,
+		Color:              s.Color,
+		HorricontalPadding: padding,
 	}
 
 	textProp.MakeValid(s.Family)
